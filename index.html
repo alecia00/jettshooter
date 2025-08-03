@@ -245,110 +245,81 @@
       animation: victory-pulse 0.8s ease-in-out infinite;
     }
 
-   /* Mobile Virtual Controls */
+    @media (hover: none) and (pointer: coarse) {
     #mobileControls {
-      position: fixed;
-      left: 0;
-      bottom: 0;
-      width: 100vw;
-      height: 240px; /* Lebih pendek agar bisa naik */
-      background: rgba(16, 17, 37, 0.88);
-      border-top: 2px solid rgba(26, 35, 126, 0.3);
-      display: none;
-      z-index: 15;
-      backdrop-filter: blur(8px);
-      /* Gunakan padding untuk naikkan seluruh kontrol */
-      padding-bottom: 70px !important; /* !important agar override style lain */
+        position: fixed !important;
+        left: 0 !important;
+        bottom: 0 !important;
+        width: 100vw !important;
+        height: 230px !important;
+        background: rgba(16, 17, 37, 0.93) !important;
+        border-top: 2px solid rgba(26, 35, 126, 0.3) !important;
+        display: block !important;
+        z-index: 1000 !important;
+        backdrop-filter: blur(8px) !important;
+        padding-bottom: 60px !important;
+        box-sizing: border-box !important;
     }
 
     .mobile-control-area {
-      height: 100%;
-      display: flex;
-      align-items: flex-end; /* biar D-Pad tidak mentok bawah */
-      justify-content: space-between;
-      padding: 0 8vw;
-      /* Tidak perlu padding-bottom lagi */
+        width: 100%;
+        height: 100%;
+        display: flex !important;
+        align-items: flex-end !important;
+        justify-content: space-between !important;
+        padding: 0 7vw 0 7vw !important;
+        box-sizing: border-box !important;
     }
 
     .mobile-dpad {
-      position: relative;
-      width: 150px;
-      height: 150px;
-      margin-bottom: 22px; /* Tambahan margin supaya D-Pad naik */
+        position: relative !important;
+        width: 150px !important;
+        height: 150px !important;
+        margin-bottom: 12px !important;
     }
 
-    /* Tombol Arrow besar dan renggang */
     .mobile-btn {
-      position: absolute;
-      background: linear-gradient(135deg, #1a237e, #00c9ff);
-      border: 3px solid #6fdfff;
-      border-radius: 20px;
-      color: #fff;
-      font-family: 'Orbitron', Arial, sans-serif;
-      font-weight: bold;
-      font-size: 32px;
-      cursor: pointer;
-      user-select: none;
-      transition: all 0.1s;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 64px;
-      height: 64px;
+        position: absolute !important;
+        background: linear-gradient(135deg, #1a237e, #00c9ff) !important;
+        border: 3px solid #6fdfff !important;
+        border-radius: 20px !important;
+        color: #fff !important;
+        font-family: 'Orbitron', Arial, sans-serif !important;
+        font-weight: bold !important;
+        font-size: 32px !important;
+        cursor: pointer !important;
+        user-select: none !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        width: 68px !important;
+        height: 68px !important;
+        box-shadow: 0 6px 20px rgba(26, 35, 126, 0.6) !important;
     }
+    .mobile-btn.up    { top: 0 !important; left: 50% !important; transform: translateX(-50%) !important;}
+    .mobile-btn.down  { bottom: 0 !important; left: 50% !important; transform: translateX(-50%) !important;}
+    .mobile-btn.left  { left: 0 !important; top: 50% !important; transform: translateY(-50%) !important;}
+    .mobile-btn.right { right: 0 !important; top: 50% !important; transform: translateY(-50%) !important;}
 
-    .mobile-btn.up {
-      top: 0;
-      left: 50%;
-      transform: translateX(-50%);
-    }
-    .mobile-btn.down {
-      bottom: 0;
-      left: 50%;
-      transform: translateX(-50%);
-    }
-    .mobile-btn.left {
-      left: 0;
-      top: 50%;
-      transform: translateY(-50%);
-    }
-    .mobile-btn.right {
-      right: 0;
-      top: 50%;
-      transform: translateY(-50%);
-    }
-
-    /* Tambahkan shadow agar tombol lebih kelihatan */
-    .mobile-btn, .mobile-shoot-btn {
-      box-shadow: 0 6px 20px rgba(26, 35, 126, 0.6);
-    }
-
-    /* Tombol FIRE naik dan tetap besar */
     .mobile-shoot-btn {
-      width: 84px;
-      height: 84px;
-      margin-bottom: 38px;  /* Supaya lebih naik dari bawah */
-      border-radius: 50%;
-      background: linear-gradient(135deg, #ff4444, #ff8888);
-      border: 4px solid #ffaaaa;
-      color: #fff;
-      font-family: 'Orbitron', Arial, sans-serif;
-      font-weight: bold;
-      font-size: 21px;
-      cursor: pointer;
-      user-select: none;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.1s;
+        width: 92px !important;
+        height: 92px !important;
+        margin-bottom: 40px !important;
+        border-radius: 50% !important;
+        background: linear-gradient(135deg, #ff4444, #ff8888) !important;
+        border: 4px solid #ffaaaa !important;
+        color: #fff !important;
+        font-family: 'Orbitron', Arial, sans-serif !important;
+        font-weight: bold !important;
+        font-size: 22px !important;
+        cursor: pointer !important;
+        user-select: none !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        box-shadow: 0 8px 25px rgba(255, 68, 68, 0.6) !important;
     }
-
-    .mobile-shoot-btn:active {
-      background: linear-gradient(135deg, #ff8888, #ff4444);
-      transform: scale(0.85);
-      box-shadow: 0 6px 20px rgba(255, 136, 136, 0.8);
     }
-
 
     @media (max-width: 1200px) {
       canvas { max-width: 98vw; max-height: calc(86vh - 200px);}
@@ -358,22 +329,7 @@
       #gameContainer { padding-bottom: 200px; }
     }
 
-    /* Show mobile controls only on touch devices */
-    @media (hover: none) and (pointer: coarse) {
-    #mobileControls {
-      position: fixed;
-      left: 0;
-      bottom: 0;
-      width: 100vw;
-      height: 240px;
-      background: rgba(16, 17, 37, 0.88);
-      border-top: 2px solid rgba(26, 35, 126, 0.3);
-      display: block !important;     /* Override agar muncul di mobile */
-      z-index: 15;
-      backdrop-filter: blur(8px);
-      padding-bottom: 70px !important;
-    }
-    }
+    
   </style>
 </head>
 <body>
