@@ -244,11 +244,129 @@
     .victory-text {
       animation: victory-pulse 0.8s ease-in-out infinite;
     }
+
+    /* Mobile Virtual Controls */
+    #mobileControls {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100vw;
+      height: 120px;
+      background: rgba(16, 17, 37, 0.95);
+      border-top: 2px solid #1a237e;
+      display: none;
+      z-index: 15;
+      backdrop-filter: blur(10px);
+    }
+    
+    .mobile-control-area {
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 20px;
+    }
+    
+    .mobile-dpad {
+      position: relative;
+      width: 120px;
+      height: 120px;
+    }
+    
+    .mobile-btn {
+      position: absolute;
+      background: linear-gradient(135deg, #1a237e, #00c9ff);
+      border: 2px solid #6fdfff;
+      border-radius: 8px;
+      color: #fff;
+      font-family: 'Orbitron', Arial, sans-serif;
+      font-weight: bold;
+      font-size: 14px;
+      cursor: pointer;
+      user-select: none;
+      transition: all 0.1s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(26, 35, 126, 0.3);
+    }
+    
+    .mobile-btn:active {
+      background: linear-gradient(135deg, #00c9ff, #1a237e);
+      transform: scale(0.95);
+      box-shadow: 0 2px 8px rgba(0, 201, 255, 0.5);
+    }
+    
+    .mobile-btn.up {
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 35px;
+      height: 35px;
+    }
+    
+    .mobile-btn.down {
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 35px;
+      height: 35px;
+    }
+    
+    .mobile-btn.left {
+      left: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 35px;
+      height: 35px;
+    }
+    
+    .mobile-btn.right {
+      right: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 35px;
+      height: 35px;
+    }
+    
+    .mobile-shoot-btn {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #ff4444, #ff8888);
+      border: 3px solid #ffaaaa;
+      color: #fff;
+      font-family: 'Orbitron', Arial, sans-serif;
+      font-weight: bold;
+      font-size: 16px;
+      cursor: pointer;
+      user-select: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 6px 16px rgba(255, 68, 68, 0.4);
+      transition: all 0.1s;
+    }
+    
+    .mobile-shoot-btn:active {
+      background: linear-gradient(135deg, #ff8888, #ff4444);
+      transform: scale(0.9);
+      box-shadow: 0 4px 12px rgba(255, 136, 136, 0.6);
+    }
+
     @media (max-width: 1200px) {
-      canvas { max-width: 98vw; max-height: 86vh;}
+      canvas { max-width: 98vw; max-height: calc(86vh - 120px);}
       .menu { min-width: 0; padding: 18px 5vw;}
       #bannerContainer { max-width: 98vw; height: 80px; margin-bottom: 5px; }
       #bannerImage { max-height: 60px; max-width: 300px; }
+      #gameContainer { padding-bottom: 120px; }
+    }
+
+    /* Show mobile controls only on touch devices */
+    @media (hover: none) and (pointer: coarse) {
+      #mobileControls {
+        display: block;
+      }
     }
   </style>
 </head>
@@ -260,6 +378,19 @@
   <canvas id="gameCanvas" width="1100" height="620"></canvas>
 </div>
 <div id="uiOverlay"></div>
+
+<!-- Mobile Virtual Controls -->
+<div id="mobileControls">
+  <div class="mobile-control-area">
+    <div class="mobile-dpad">
+      <div class="mobile-btn up" data-key="w">↑</div>
+      <div class="mobile-btn down" data-key="s">↓</div>
+      <div class="mobile-btn left" data-key="a">←</div>
+      <div class="mobile-btn right" data-key="d">→</div>
+    </div>
+    <div class="mobile-shoot-btn">FIRE</div>
+  </div>
+</div>
 
 <!-- AUDIO SOUND EFFECTS -->
 <audio id="startSound" src="start.mp3"></audio>
@@ -928,11 +1059,51 @@ function gameLoop(ts) {
   requestAnimationFrame(gameLoop);
 }
 
+// Mobile controls event handlers
+function initMobileControls() {
+  const mobileControls = document.getElementById('mobileControls');
+  const mobileBtns = document.querySelectorAll('.mobile-btn');
+  const shootBtn = document.querySelector('.mobile-shoot-btn');
+  
+  // Movement buttons
+  mobileBtns.forEach(btn => {
+    const key = btn.getAttribute('data-key');
+    
+    btn.addEventListener('touchstart', (e) => {
+      e.preventDefault();
+      keys[key] = true;
+    });
+    
+    btn.addEventListener('touchend', (e) => {
+      e.preventDefault();
+      keys[key] = false;
+    });
+    
+    btn.addEventListener('touchcancel', (e) => {
+      e.preventDefault();
+      keys[key] = false;
+    });
+  });
+  
+  // Shoot button
+  shootBtn.addEventListener('touchstart', (e) => {
+    e.preventDefault();
+    fireBullet();
+  });
+  
+  shootBtn.addEventListener('touchend', (e) => {
+    e.preventDefault();
+  });
+}
+
 window.onload = function() {
   canvas = document.getElementById('gameCanvas');
   ctx = canvas.getContext('2d');
   ui = document.getElementById('uiOverlay');
   setAllVolume(volume);
+  
+  // Initialize mobile controls
+  initMobileControls();
   
   // Show banner when image loads
   const bannerImg = document.getElementById('bannerImage');
@@ -1001,4 +1172,3 @@ window.onblur = function(){ for(let k in keys) keys[k]=false; mouse.pressed=fals
 </script>
 </body>
 </html>
-
