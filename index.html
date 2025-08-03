@@ -247,13 +247,75 @@
 
     @media (hover: none) and (pointer: coarse) {
     #mobileControls {
-        background: red !important;
-        height: 333px !important;
-        display: block !important;
+    position: fixed !important;
+    left: 0 !important;
+    bottom: 0 !important;
+    width: 100vw !important;
+    height: 230px !important;
+    background: rgba(16, 17, 37, 0.93) !important;
+    border-top: 2px solid rgba(26, 35, 126, 0.3) !important;
+    display: block !important;
+    z-index: 1000 !important;
+    backdrop-filter: blur(8px) !important;
+    padding-bottom: 60px !important;
+    box-sizing: border-box !important;
     }
-    .mobile-btn { background: yellow !important; width: 88px !important; height: 88px !important; }
-    .mobile-shoot-btn { background: blue !important; width: 120px !important; height: 120px !important; }
+    .mobile-control-area {
+        width: 100%;
+        height: 100%;
+        display: flex !important;
+        align-items: flex-end !important;
+        justify-content: space-between !important;
+        padding: 0 7vw 0 7vw !important;
+        box-sizing: border-box !important;
     }
+    .mobile-dpad {
+        position: relative !important;
+        width: 150px !important;
+        height: 150px !important;
+        margin-bottom: 12px !important;
+    }
+    .mobile-btn {
+        position: absolute !important;
+        background: linear-gradient(135deg, #1a237e, #00c9ff) !important;
+        border: 3px solid #6fdfff !important;
+        border-radius: 20px !important;
+        color: #fff !important;
+        font-family: 'Orbitron', Arial, sans-serif !important;
+        font-weight: bold !important;
+        font-size: 32px !important;
+        cursor: pointer !important;
+        user-select: none !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        width: 68px !important;
+        height: 68px !important;
+        box-shadow: 0 6px 20px rgba(26, 35, 126, 0.6) !important;
+    }
+    .mobile-btn.up    { top: 0 !important; left: 50% !important; transform: translateX(-50%) !important;}
+    .mobile-btn.down  { bottom: 0 !important; left: 50% !important; transform: translateX(-50%) !important;}
+    .mobile-btn.left  { left: 0 !important; top: 50% !important; transform: translateY(-50%) !important;}
+    .mobile-btn.right { right: 0 !important; top: 50% !important; transform: translateY(-50%) !important;}
+    .mobile-shoot-btn {
+        width: 92px !important;
+        height: 92px !important;
+        margin-bottom: 40px !important;
+        border-radius: 50% !important;
+        background: linear-gradient(135deg, #ff4444, #ff8888) !important;
+        border: 4px solid #ffaaaa !important;
+        color: #fff !important;
+        font-family: 'Orbitron', Arial, sans-serif !important;
+        font-weight: bold !important;
+        font-size: 22px !important;
+        cursor: pointer !important;
+        user-select: none !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        box-shadow: 0 8px 25px rgba(255, 68, 68, 0.6) !important;
+    }
+
 
     @media (max-width: 1200px) {
       canvas { max-width: 98vw; max-height: calc(86vh - 200px);}
