@@ -1,0 +1,1003 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Space Shooter - Have Fun Mode!</title>
+  <meta name="viewport" content="width=1200">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap');
+    body {
+      margin: 0;
+      background: #101125;
+      overflow: hidden;
+      font-family: 'Orbitron', Arial, sans-serif;
+      color: #fff;
+      user-select: none;
+    }
+    #gameContainer {
+        width: 100vw;
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 15px;
+        padding: 20px 0;
+    }
+    #bannerContainer {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background: none;        /* Hapus background */
+        border: none;            /* Hapus border */
+        box-shadow: none;        /* Hapus shadow */
+        border-radius: 0;        /* Hapus radius */
+        margin-bottom: 15px;
+        max-width: 1100px;
+        position: relative;
+        overflow: visible;
+        height: auto;
+        min-height: unset;
+    }
+    #bannerContainer::before {
+        display: none !important; /* Jangan tampilkan efek overlay */
+    }
+    #bannerImage {
+        max-height: 80px;
+        max-width: 400px;
+        object-fit: contain;
+        opacity: 1;
+        filter: drop-shadow(0 0 15px rgba(111, 223, 255, 0.4)); /* Boleh dihapus kalau mau tanpa efek glow */
+        z-index: 2;
+        position: relative;
+        transition: all 0.3s ease;
+        background: none;
+        border: none;
+        box-shadow: none;
+    }
+    #bannerImage:hover {
+      transform: scale(1.05);
+      filter: drop-shadow(0 0 25px rgba(111, 223, 255, 0.6));
+    }
+    canvas {
+      background: linear-gradient(180deg, #161b2d 70%, #262b44 100%);
+      border-radius: 38px;
+      box-shadow: 0 0 40px #101030;
+      image-rendering: pixelated;
+      display: block;
+    }
+    #uiOverlay {
+      position: fixed;
+      top: 0; left: 0; width: 100vw; height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 10;
+      background: rgba(16,18,38,0.73);
+      flex-direction: column;
+      pointer-events: none;
+      text-align: center;
+      font-family: 'Orbitron', Arial, sans-serif;
+    }
+    .menu {
+      background: rgba(28,30,55,0.92);
+      border-radius: 24px;
+      box-shadow: 0 0 24px #0009;
+      padding: 40px 54px 32px 54px;
+      pointer-events: all;
+      margin: 0;
+      min-width: 340px;
+      min-height: 100px;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .menu h1 {
+      font-size: 2.6rem;
+      letter-spacing: 6px;
+      margin: 0 0 16px 0;
+      color: #6fdfff;
+      text-shadow: 0 2px 6px #0009;
+    }
+    .menu button, .menu .vol-btn {
+      font-size: 1.18rem;
+      background: linear-gradient(90deg, #1a237e, #00c9ff);
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      padding: 11px 34px;
+      margin: 24px 0 0 0;
+      cursor: pointer;
+      font-family: inherit;
+      box-shadow: 0 4px 16px #1114;
+      letter-spacing: 2px;
+      transition: 0.2s;
+    }
+    .menu button:hover, .menu .vol-btn:hover {
+      background: linear-gradient(90deg, #00c9ff, #1a237e);
+      letter-spacing: 4px;
+      color: #fff;
+    }
+    .menu .code {
+      background: #222842;
+      color: #6fdfff;
+      font-size: 1.4rem;
+      letter-spacing: 4px;
+      padding: 9px 24px;
+      border-radius: 10px;
+      display: inline-block;
+      margin-top: 19px;
+    }
+    .info {
+      font-size: 1.13rem;
+      color: #aacfff;
+      margin-top: 12px;
+      text-shadow: 0 1px 2px #0005;
+    }
+    .vol-wrap {
+      margin: 12px 0 0 0;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      justify-content: center;
+    }
+    .vol-btn {
+      padding: 10px 20px;
+      min-width: 38px;
+      font-size: 1.2rem;
+      margin: 0;
+      border-radius: 7px;
+      background: linear-gradient(90deg,#1a225d 60%,#28b5fa);
+      box-shadow: 0 2px 9px #112a;
+      border: none;
+      color: #fff;
+      font-family: inherit;
+      cursor: pointer;
+      transition: background .2s;
+      outline: none;
+    }
+    .vol-btn:active { background: #07203a; }
+    .vol-meter {
+      width: 85px;
+      height: 12px;
+      background: #233148;
+      border-radius: 7px;
+      margin: 0 6px;
+      display: inline-block;
+      vertical-align: middle;
+      overflow: hidden;
+      box-shadow: 0 0 4px #0af5;
+    }
+    .vol-fill {
+      height: 100%;
+      background: linear-gradient(90deg,#39e7ff 10%,#45aaff 90%);
+      border-radius: 7px;
+      transition: width .15s;
+    }
+    .sound-btn {
+      margin-top: 8px;
+      background: #2d3559;
+      color: #7dcfff;
+      border: none;
+      border-radius: 8px;
+      padding: 7px 18px;
+      font-size: 1rem;
+      cursor: pointer;
+      letter-spacing: 1px;
+      transition: 0.2s;
+    }
+    .sound-btn:hover {
+      background: #415484;
+      color: #fff;
+    }
+    .toggle-btn {
+      background: #1d2d3c;
+      color: #82deff;
+      border-radius: 8px;
+      border: none;
+      padding: 7px 17px;
+      font-size: 1rem;
+      margin-top: 12px;
+      box-shadow: 0 2px 8px #0af3;
+      cursor: pointer;
+      letter-spacing: 1px;
+      transition: 0.2s;
+      font-family: inherit;
+    }
+    .toggle-btn.on {
+      background: #0d314c;
+      color: #fff;
+      box-shadow: 0 2px 12px #28e9ff77;
+    }
+    .mode-wrap {
+      display: flex; gap: 14px; justify-content: center; align-items: center; margin-top: 12px;
+    }
+    .mode-btn {
+      padding: 10px 23px;
+      background: #151b36;
+      color: #91e2ff;
+      border-radius: 10px;
+      font-size: 1.15rem;
+      border: 2px solid #2d385a;
+      margin: 0;
+      letter-spacing: 1px;
+      cursor: pointer;
+      transition: 0.18s;
+    }
+    .mode-btn.selected,
+    .mode-btn:hover { background: linear-gradient(90deg,#41e0fa,#156baf); color: #fff; border-color: #3dd3fa; }
+    .win-anim {
+      animation: win-anim-glow 0.11s infinite alternate;
+    }
+    @keyframes win-anim-glow {
+      0%   { filter: brightness(1.5) drop-shadow(0 0 16px #53fff6); }
+      100% { filter: brightness(2.0) drop-shadow(0 0 34px #fffc86); }
+    }
+    @keyframes victory-pulse {
+      0%, 100% { transform: scale(1) rotate(0deg); opacity: 1; }
+      25% { transform: scale(1.1) rotate(5deg); opacity: 0.8; }
+      50% { transform: scale(1.2) rotate(-5deg); opacity: 1; }
+      75% { transform: scale(1.1) rotate(3deg); opacity: 0.9; }
+    }
+    .victory-text {
+      animation: victory-pulse 0.8s ease-in-out infinite;
+    }
+    @media (max-width: 1200px) {
+      canvas { max-width: 98vw; max-height: 86vh;}
+      .menu { min-width: 0; padding: 18px 5vw;}
+      #bannerContainer { max-width: 98vw; height: 80px; margin-bottom: 5px; }
+      #bannerImage { max-height: 60px; max-width: 300px; }
+    }
+  </style>
+</head>
+<body>
+<div id="gameContainer">
+  <div id="bannerContainer">
+    <img id="bannerImage" src="banner.png" alt="EthOS Banner">
+  </div>
+  <canvas id="gameCanvas" width="1100" height="620"></canvas>
+</div>
+<div id="uiOverlay"></div>
+
+<!-- AUDIO SOUND EFFECTS -->
+<audio id="startSound" src="start.mp3"></audio>
+<audio id="backSound" src="backsound.mp3" loop></audio>
+<audio id="bossSound" src="soundbos.mp3" loop></audio>
+<audio id="laserSound" src="laser.mp3"></audio>
+<audio id="gameoverSound" src="gameover.mp3"></audio>
+<audio id="rewardSound" src="reward.mp3"></audio>
+<audio id="finishSound" src="finish.mp3"></audio>
+<audio id="explosionSound" src="ledak.mp3"></audio>
+
+<script>
+const GAME_W = 1100, GAME_H = 620;
+let ctx, canvas, ui, keys = {}, mouse = {x:0, y:0, pressed: false};
+let player, bullets = [], enemies = [], rewards = [], healthPacks = [], boss = null, score = 0, gameStart = false, bossSpawned = false, bossWinAnim = false;
+let bgStars = [], planets = [], bgBanner = null;
+let dragToMove = false;
+let volume = 0.10;
+let mode = "normal";
+let gamePhase = "normal"; // "normal", "boss", "bossDefeated"
+let bossWarning = false; // Untuk warning boss akan datang
+let MODECFG = {
+  easy:   { enemySpeed:2.1, bossSpeed:1.5, bulletCd:210, bossCd:99, enemyCd:1500, rewardCd:4500, healthCd:6000, time:45, bossBullet:5.5, bossHp:3 },
+  normal: { enemySpeed:3.0, bossSpeed:2.3, bulletCd:140, bossCd:65, enemyCd:900,  rewardCd:3900, healthCd:5200, time:35, bossBullet:8.5, bossHp:3 },
+  hard:   { enemySpeed:4.5, bossSpeed:3.3, bulletCd:110, bossCd:38, enemyCd:520,  rewardCd:2700, healthCd:4800, time:25, bossBullet:12.0, bossHp:3 }
+};
+let config, lastShot = 0, lastEnemy = 0, lastReward = 0, lastHealth = 0, bossTime = 0, healthBarTimer = 0;
+let bossExplosionTimer = 0, bossExplosions = [];
+let bgmPlaying = false;
+let imgPlayer = new Image(), imgEnemy = new Image(), imgReward = new Image(), imgBoss = new Image(), imgHealth = new Image();
+imgPlayer.src = "karakter.png";
+imgEnemy.src = "enemy.png";
+imgReward.src = "logo.png";
+imgBoss.src = "boss.png";
+
+// Generate health pack image (red cross)
+function genHealthImage() {
+  let c = document.createElement('canvas');
+  c.width = 40; c.height = 40;
+  let cx = c.getContext('2d');
+  // Red background circle
+  cx.fillStyle = "#ff4444";
+  cx.beginPath();
+  cx.arc(20, 20, 18, 0, Math.PI*2);
+  cx.fill();
+  // White cross
+  cx.fillStyle = "#ffffff";
+  cx.fillRect(16, 8, 8, 24);
+  cx.fillRect(8, 16, 24, 8);
+  return c;
+}
+imgHealth.src = genHealthImage().toDataURL();
+
+function setAllVolume(vol) {
+  ["startSound","backSound","bossSound","laserSound","gameoverSound","rewardSound","finishSound","explosionSound"]
+    .forEach(id => {
+      let el = document.getElementById(id);
+      if (el) el.volume = vol;
+    });
+}
+
+function playSound(id, force) {
+  let el = document.getElementById(id);
+  if (!el) return;
+  el.currentTime = 0;
+  if (force || el.paused) el.play();
+}
+function stopSound(id) {
+  let el = document.getElementById(id);
+  if (el && !el.paused) el.pause();
+}
+function randInt(a, b) { return a + Math.floor(Math.random()*(b-a+1)); }
+function randF(a, b) { return a + Math.random()*(b-a); }
+function collide(r1, r2) {
+  return !(r2.x > r1.x+r1.w || r2.x+r2.w < r1.x || r2.y > r1.y+r1.h || r2.y+r2.h < r1.y);
+}
+function genCode(n=10) {
+  let chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+  let code = "";
+  for (let i=0;i<n;i++) code += chars[randInt(0,chars.length-1)];
+  return code;
+}
+
+function drawPlayer(winBlink = false) {
+  ctx.save();
+  if (winBlink && Math.floor(Date.now()/80)%2===0) {
+    ctx.globalAlpha = 0.6 + 0.3 * Math.random();
+    ctx.filter = 'drop-shadow(0 0 40px #ffff94)';
+  }
+  ctx.shadowColor="#0ff"; ctx.shadowBlur=18;
+  ctx.drawImage(imgPlayer, player.x, player.y, player.w, player.h);
+  ctx.restore();
+  // Health bar
+  if (player.hp < player.maxHp || healthBarTimer > 0 || bossTime < 2) {
+    let pct = player.hp/player.maxHp;
+    let bx = player.x + player.w/2 - 44, by = player.y - 18;
+    ctx.save();
+    ctx.globalAlpha = 0.87;
+    ctx.fillStyle="#132431";
+    ctx.fillRect(bx, by, 88, 11);
+    ctx.fillStyle = pct>0.5 ? "#37fc75" : (pct>0.25 ? "#fbc942" : "#fa5c5c");
+    ctx.fillRect(bx, by, 88*pct, 11);
+    ctx.strokeStyle="#fff"; ctx.lineWidth=2;
+    ctx.strokeRect(bx, by, 88, 11);
+    ctx.globalAlpha=1;
+    ctx.font="bold 13px Orbitron";
+    ctx.fillStyle="#fff";
+    ctx.fillText(`${player.hp}/${player.maxHp}`, bx+30, by+9);
+    ctx.restore();
+  }
+}
+function drawEnemy(e) {
+  ctx.save();
+  ctx.shadowColor="#ff0"; ctx.shadowBlur=14;
+  ctx.drawImage(imgEnemy, e.x, e.y, e.w, e.h);
+  ctx.restore();
+}
+function drawReward(rw) {
+  ctx.save();
+  ctx.shadowColor="#f9f95a"; ctx.shadowBlur=16;
+  ctx.drawImage(imgReward, rw.x, rw.y, rw.w, rw.h);
+  ctx.restore();
+}
+function drawHealthPack(hp) {
+  ctx.save();
+  ctx.shadowColor="#ff4444"; ctx.shadowBlur=12;
+  ctx.drawImage(imgHealth, hp.x, hp.y, hp.w, hp.h);
+  ctx.restore();
+}
+function drawBullet(b) {
+  ctx.save();
+  ctx.globalAlpha = 0.9;
+  let grd = ctx.createLinearGradient(b.x, b.y, b.x, b.y + 34);
+  grd.addColorStop(0, "#72faff");
+  grd.addColorStop(0.8, "#00e9ff");
+  grd.addColorStop(1, "#c4feff00");
+  ctx.fillStyle = grd;
+  ctx.beginPath();
+  ctx.roundRect(b.x+7, b.y, 8, 28, 6);
+  ctx.fill();
+  ctx.globalAlpha = 1.0;
+  ctx.restore();
+}
+function drawBoss(b) {
+  if (bossExplosionTimer > 0) {
+    // Boss explosion effect
+    ctx.save();
+    ctx.globalAlpha = Math.max(0, bossExplosionTimer / 60);
+    ctx.shadowColor="#ff0000"; ctx.shadowBlur=50;
+    
+    // Multiple explosion circles
+    for (let i = 0; i < 8; i++) {
+      let angle = (i / 8) * Math.PI * 2;
+      let radius = 40 + (60 - bossExplosionTimer) * 2;
+      let ex = b.x + b.w/2 + Math.cos(angle) * radius * 0.5;
+      let ey = b.y + b.h/2 + Math.sin(angle) * radius * 0.5;
+      
+      ctx.fillStyle = i % 2 === 0 ? "#ff4444" : "#ffaa00";
+      ctx.beginPath();
+      ctx.arc(ex, ey, 15 + Math.random() * 10, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    
+    // Central explosion
+    ctx.fillStyle = "#ffffff";
+    ctx.beginPath();
+    ctx.arc(b.x + b.w/2, b.y + b.h/2, 30 + Math.random() * 20, 0, Math.PI * 2);
+    ctx.fill();
+    
+    ctx.restore();
+    return;
+  }
+  
+  ctx.save();
+  ctx.shadowColor="#ff69f5"; ctx.shadowBlur=30;
+  ctx.drawImage(imgBoss, b.x, b.y, b.w, b.h);
+  ctx.restore();
+  // HP bar
+  let bx = b.x+b.w/2-48, by = b.y-24;
+  ctx.fillStyle="#191b2b"; ctx.globalAlpha=0.22;
+  ctx.fillRect(bx, by, 96, 14);
+  ctx.globalAlpha=1.0;
+  ctx.fillStyle="#ffb6fb";
+  ctx.fillRect(bx, by, 96*(b.hp/b.maxHp), 14);
+  ctx.strokeStyle="#ffdefd"; ctx.lineWidth=2;
+  ctx.strokeRect(bx, by, 96, 14);
+  ctx.font = "bold 15px Orbitron, Arial"; ctx.fillStyle="#fff";
+  ctx.fillText("BOSS", bx+25, by+12);
+  ctx.globalAlpha=1.0;
+}
+
+function drawBg() {
+  ctx.save();
+  
+  // Banner sekarang di luar canvas, jadi tidak perlu digambar di sini
+  
+  for(let s of bgStars){
+    ctx.globalAlpha = s.a;
+    ctx.beginPath();
+    ctx.arc(s.x, s.y, s.r, 0, Math.PI*2);
+    ctx.fillStyle = "#fff";
+    ctx.fill();
+  }
+  for(let p of planets) {
+    ctx.globalAlpha = 0.13;
+    let g = ctx.createRadialGradient(p.x, p.y, p.r*0.3, p.x, p.y, p.r);
+    g.addColorStop(0,"#60e3e6");
+    g.addColorStop(1,"#161c38");
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
+    ctx.fillStyle = g;
+    ctx.fill();
+  }
+  ctx.globalAlpha=1;
+  ctx.restore();
+}
+
+function showMenu() {
+  setAllVolume(volume);
+  ui.innerHTML = `<div class="menu" id="mainMenu">
+    <h1>SPACE SHOOTER</h1>
+    <div class="mode-wrap">
+      <button class="mode-btn" id="modeEasy" onclick="selectMode('easy')">Easy</button>
+      <button class="mode-btn selected" id="modeNormal" onclick="selectMode('normal')">Normal</button>
+      <button class="mode-btn" id="modeHard" onclick="selectMode('hard')">Hard</button>
+    </div>
+    <button id="startBtn" onclick="startGame()">START GAME<br><span style='font-size:0.95rem;'>(Space/Click)</span></button>
+    <div class="vol-wrap">
+      <button class="vol-btn" id="volMin">&#8722;</button>
+      <div class="vol-meter"><div id="volFill" class="vol-fill" style="width:${volume*100}%"></div></div>
+      <button class="vol-btn" id="volPlus">&#43;</button>
+    </div>
+    <span style="color:#59ecff;font-size:1.0rem; margin-top:6px;display:inline-block;">Volume: <span id="volNum">${Math.round(volume*100)}</span>%</span>
+    <button class="sound-btn" onclick="toggleBGM()" id="bgmBtn">Toggle BGM</button>
+    <button class="toggle-btn" onclick="toggleMoveMode()" id="moveModeBtn">Drag to Move: OFF</button>
+    <div class="info">A/D/W/S/←/→/↑/↓ to move<br>SPACE/CTRL/click to shoot.<br>Dodge enemy, collect <b>logo</b>, heal with <b style="color:#ff6666;">❤</b>, beat the BOSS!<br>Created by brrbrr.</div>
+  </div>`;
+  ui.style.display = 'flex';
+  updateVolUI();
+  // Vol event handler agar tidak trigger start
+  setTimeout(()=>{
+    document.getElementById("volMin").onclick = function(e) { e.stopPropagation(); changeVolume(-0.1); };
+    document.getElementById("volPlus").onclick = function(e) { e.stopPropagation(); changeVolume(0.1); };
+    // Prevent overlay click start
+    document.getElementById("uiOverlay").onclick = function(e) {
+      if (e.target.tagName === "BUTTON") return;
+      e.stopPropagation();
+    }
+  }, 80);
+  document.getElementById("mode" + mode.charAt(0).toUpperCase() + mode.substr(1)).classList.add("selected");
+}
+
+function showGameOver() {
+  stopSound('backSound');
+  stopSound('bossSound');
+  playSound('gameoverSound', true);
+  
+  let retryText = gamePhase === "boss" ? "RETRY BOSS<br><span style='font-size:0.95rem;'>(Space/Click)</span>" : "RETRY<br><span style='font-size:0.95rem;'>(Space/Click)</span>";
+  
+  ui.innerHTML = `<div class="menu">
+    <h1>GAME OVER</h1>
+    <div class="info">Score: <b>${score}</b></div>
+    <button onclick="retryGame()" id="retryBtn">${retryText}</button>
+  </div>`;
+  ui.style.display = 'flex';
+}
+
+function showCongratsWithAnim() {
+  // Winning animation for 3 seconds, then congrats
+  bossWinAnim = true;
+  setTimeout(()=>{
+    bossWinAnim = false;
+    showCongrats();
+  }, 3000);
+}
+
+function showCongrats() {
+  stopSound('backSound');
+  stopSound('bossSound');
+  playSound('finishSound', true);
+  let code = genCode(randInt(7,12));
+  ui.innerHTML = `<div class="menu">
+    <h1>CONGRATS!</h1>
+    <div class="info">Congrats you kill the boss!<br><span class="code">${code}</span><br>Welcome!</div>
+    <button onclick="startGame()" id="playAgainBtn">PLAY AGAIN<br><span style='font-size:0.95rem;'>(Space/Click)</span></button>
+  </div>`;
+  ui.style.display = 'flex';
+}
+
+function updateVolUI() {
+  const fill = document.getElementById('volFill');
+  const num = document.getElementById('volNum');
+  if(fill) fill.style.width = `${volume*100}%`;
+  if(num) num.textContent = Math.round(volume*100);
+}
+
+function changeVolume(delta) {
+  volume += delta;
+  if(volume < 0) volume = 0;
+  if(volume > 1) volume = 1;
+  setAllVolume(volume);
+  updateVolUI();
+}
+
+function toggleBGM() {
+  let bg = document.getElementById("backSound");
+  if(bg.paused) { bg.play(); document.getElementById("bgmBtn").textContent="Pause BGM"; }
+  else { bg.pause(); document.getElementById("bgmBtn").textContent="Play BGM"; }
+}
+
+function toggleMoveMode() {
+  dragToMove = !dragToMove;
+  document.getElementById('moveModeBtn').textContent = `Drag to Move: ${dragToMove ? 'ON' : 'OFF'}`;
+}
+
+function selectMode(m) {
+  mode = m;
+  ["modeEasy","modeNormal","modeHard"].forEach(id=>document.getElementById(id).classList.remove("selected"));
+  document.getElementById("mode" + mode.charAt(0).toUpperCase() + mode.substr(1)).classList.add("selected");
+}
+
+function startGame() {
+  config = MODECFG[mode];
+  gamePhase = "normal";
+  bossWarning = false; // Reset warning status
+  playSound('startSound', true);
+  setTimeout(()=>{ playSound('backSound', true); }, 400);
+  ui.innerHTML = '';
+  ui.style.display = 'none';
+  score = 0; gameStart = true; bossSpawned = false; lastShot = 0; lastEnemy = 0; lastReward = 0; lastHealth = 0;
+  bullets = []; enemies = []; rewards = []; healthPacks = [];
+  player = {x:110, y:GAME_H/2-52, w:90, h:86, alive:true, hp:3, maxHp:3};
+  boss = null; bossTime = 0; healthBarTimer = 0; bossWinAnim = false; bossExplosionTimer = 0; bossExplosions = [];
+  bgStars = [];
+  for(let i=0;i<66;i++)
+    bgStars.push({x:randInt(0,GAME_W), y:randInt(0,GAME_H), r:randF(0.7,2.6), a:randF(0.33,1)});
+  planets = [
+    {x:GAME_W*0.66, y:GAME_H*0.23, r:randInt(70, 120)},
+    {x:GAME_W*0.19, y:GAME_H*0.10, r:randInt(40, 70)},
+    {x:GAME_W*0.58, y:GAME_H*0.76, r:randInt(37, 67)}
+  ];
+  
+  // PERBAIKAN TIMING MUSIK BOSS - Warning 5 detik sebelum boss spawn
+  setTimeout(()=>{ 
+    bossWarning = true;
+    // Mulai putar musik boss 5 detik sebelum boss spawn
+    stopSound('backSound');
+    playSound('bossSound', true);
+  }, (config.time - 5) * 1000);
+  
+  // Boss spawns after config.time seconds
+  setTimeout(()=>{ bossTime = 1; }, config.time*1000);
+  requestAnimationFrame(gameLoop);
+}
+
+function retryGame() {
+  if (gamePhase === "boss") {
+    // Retry from boss phase
+    config = MODECFG[mode];
+    gamePhase = "boss";
+    bossWarning = false;
+    playSound('startSound', true);
+    setTimeout(()=>{ playSound('bossSound', true); }, 400);
+    ui.innerHTML = '';
+    ui.style.display = 'none';
+    gameStart = true; bossSpawned = true; lastShot = 0; lastEnemy = 0; lastReward = 0; lastHealth = 0;
+    bullets = []; enemies = []; rewards = []; healthPacks = [];
+    player = {x:110, y:GAME_H/2-52, w:90, h:86, alive:true, hp:3, maxHp:3};
+    bossTime = 0; healthBarTimer = 0; bossWinAnim = false; bossExplosionTimer = 0; bossExplosions = [];
+    spawnBoss();
+    requestAnimationFrame(gameLoop);
+  } else {
+    // Retry from beginning
+    startGame();
+  }
+}
+
+function spawnEnemy() {
+  enemies.push({x: GAME_W+randInt(0,60), y:randInt(30, GAME_H-80), w:78, h:68, spd:config.enemySpeed});
+}
+
+function spawnReward() {
+  rewards.push({x: GAME_W+randInt(0,60), y:randInt(40,GAME_H-65), w:60, h:60, spd:config.enemySpeed-0.8});
+}
+
+function spawnHealthPack() {
+  if (mode === 'normal' || mode === 'hard') {
+    healthPacks.push({x: GAME_W+randInt(0,60), y:randInt(50,GAME_H-70), w:40, h:40, spd:config.enemySpeed-1.2});
+  }
+}
+
+function spawnBoss() {
+  boss = {x: GAME_W-200, y: GAME_H/2-80, w:160, h:140, hp: config.bossHp, maxHp: config.bossHp, spd: config.bossSpeed, dir: 1, fireCD: 0, projectiles:[]};
+  bossSpawned = true;
+  gamePhase = "boss";
+  // Musik boss sudah dimulai sebelumnya, jadi tidak perlu switch lagi
+}
+
+function fireBullet() {
+  if (!player.alive || bossWinAnim || bossExplosionTimer > 0) return;
+  let now = performance.now();
+  if (now-lastShot<config.bulletCd) return;
+  lastShot = now;
+  playSound('laserSound');
+  bullets.push({x: player.x+player.w-18, y: player.y+player.h/2-12, w:18, h:32});
+}
+
+function gameOver() {
+  gameStart = false;
+  player.alive = false;
+  setTimeout(showGameOver, 350);
+}
+
+function winGame() {
+  gameStart = false;
+  player.alive = false;
+  gamePhase = "bossDefeated";
+  
+  // Start boss explosion
+  bossExplosionTimer = 60;
+  playSound('explosionSound', true);
+  
+  setTimeout(() => {
+    showCongratsWithAnim();
+  }, 1000);
+}
+
+function gameLoop(ts) {
+  if (!gameStart && !bossWinAnim) return;
+  ctx.clearRect(0, 0, GAME_W, GAME_H);
+  drawBg();
+  
+  // Handle boss explosion timer
+  if (bossExplosionTimer > 0) {
+    bossExplosionTimer--;
+  }
+  
+  for(let p of planets) p.x -= 0.10;
+  planets = planets.filter(p=>p.x+p.r>0);
+  for(let s of bgStars){ s.x-=s.r*0.21; if(s.x<0) s.x=GAME_W+randF(0,50); }
+  
+  // WIN ANIMATION - Enhanced
+  if (bossWinAnim) {
+    drawPlayer(true);
+    ctx.save();
+    ctx.font = "bold 4.5rem Orbitron";
+    ctx.fillStyle = "#fff";
+    ctx.shadowColor = "#fffd93";
+    ctx.shadowBlur = 25;
+    ctx.globalAlpha = 0.95;
+    ctx.textAlign="center";
+    
+    // Animated "YOU WIN!" text
+    let time = Date.now() * 0.003;
+    ctx.save();
+    ctx.translate(GAME_W/2, GAME_H/2-60);
+    ctx.rotate(Math.sin(time) * 0.1);
+    ctx.scale(1 + Math.sin(time * 2) * 0.1, 1 + Math.cos(time * 2) * 0.1);
+    ctx.fillText("YOU WIN!", 0, 0);
+    ctx.restore();
+    
+    // Enhanced particle effects
+    for(let i=0;i<36;i++){
+      ctx.save();
+      let angle = i * 0.17 + Date.now() * 0.002;
+      let radius = 200 + Math.sin(Date.now() * 0.003 + i) * 50;
+      let x = GAME_W/2 + Math.cos(angle) * radius;
+      let y = GAME_H/2-60 + Math.sin(angle) * radius * 0.6;
+      
+      ctx.globalAlpha = 0.6 + 0.4 * Math.sin(Date.now() * 0.005 + i);
+      ctx.fillStyle = ["#8ef2ff","#fff3b7","#ffb3f2","#a7ffd6","#fdffbb","#f6bbff"][i%6];
+      ctx.beginPath();
+      ctx.arc(x, y, 4 + Math.sin(i * Date.now() * 0.001) * 2, 0, Math.PI*2);
+      ctx.fill();
+      ctx.restore();
+    }
+    
+    // Sparkling stars
+    for(let j=0;j<20;j++){
+      ctx.save();
+      let sparkX = GAME_W/2 + (Math.random()-0.5) * 600;
+      let sparkY = GAME_H/2 + (Math.random()-0.5) * 400;
+      ctx.globalAlpha = Math.random();
+      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(sparkX, sparkY, 3, 3);
+      ctx.restore();
+    }
+    
+    requestAnimationFrame(gameLoop);
+    return;
+  }
+  
+  // --- DRAWING
+  drawPlayer();
+  for(let b of bullets) { b.x += 15; drawBullet(b);}
+  bullets = bullets.filter(b => b.x < GAME_W+30);
+
+  if (!bossSpawned && bossTime) { spawnBoss(); bossTime = 0; }
+  
+  if (gamePhase === "normal" && !bossSpawned) {
+    for(let e of enemies) {
+      e.x -= e.spd;
+      drawEnemy(e);
+      if (collide(player, e) && player.alive) {
+        player.hp--;
+        healthBarTimer = 140;
+        if (player.hp <= 0) { playSound('gameoverSound', true); gameOver(); return; }
+        enemies.splice(enemies.indexOf(e),1);
+        continue;
+      }
+      for(let i=0;i<bullets.length;i++) {
+        if (collide(e, bullets[i])) {
+          enemies.splice(enemies.indexOf(e),1);
+          bullets.splice(i,1);
+          score+=5;
+          break;
+        }
+      }
+    }
+    enemies = enemies.filter(e => e.x+e.w>0);
+    
+    for(let rw of rewards){
+      rw.x -= rw.spd;
+      drawReward(rw);
+      if (collide(player, rw) && player.alive) {
+        score+=10;
+        playSound('rewardSound', true);
+        rewards.splice(rewards.indexOf(rw),1);
+      }
+    }
+    rewards = rewards.filter(rw => rw.x+rw.w>0);
+    
+    // Health packs for normal and hard mode
+    for(let hp of healthPacks){
+      hp.x -= hp.spd;
+      drawHealthPack(hp);
+      if (collide(player, hp) && player.alive) {
+        // Heal player (30% chance to heal)
+        if (Math.random() < 0.3) {
+          player.hp = Math.min(player.hp + 1, player.maxHp);
+          healthBarTimer = 200;
+        }
+        score += 3;
+        playSound('rewardSound', true);
+        healthPacks.splice(healthPacks.indexOf(hp),1);
+      }
+    }
+    healthPacks = healthPacks.filter(hp => hp.x+hp.w>0);
+    
+    let now = performance.now();
+    if (now-lastEnemy > config.enemyCd) { lastEnemy=now; spawnEnemy();}
+    if (now-lastReward > config.rewardCd) { lastReward=now; spawnReward();}
+    if (now-lastHealth > config.healthCd) { lastHealth=now; spawnHealthPack();}
+  } else if (boss && gamePhase === "boss") {
+    // Boss movement - smoother and more fluid
+    boss.y += boss.dir*boss.spd;
+    if (boss.y<15||boss.y+boss.h>GAME_H-22) boss.dir*=-1;
+    boss.fireCD--;
+    if (boss.fireCD<=0) {
+      boss.fireCD = randInt(config.bossCd, config.bossCd+40);
+      boss.projectiles.push({x: boss.x-13, y: boss.y+randInt(30,boss.h-30), w:27, h:18, spd: config.bossBullet});
+    }
+    for(let p of boss.projectiles) {
+      p.x -= p.spd;
+      ctx.save();
+      ctx.globalAlpha=0.93;
+      ctx.fillStyle="#f46bfb";
+      ctx.beginPath(); ctx.ellipse(p.x, p.y, p.w, p.h, 0, 0, Math.PI*2); ctx.fill();
+      ctx.restore();
+      if (collide(player,p) && player.alive) {
+        player.hp--;
+        healthBarTimer = 140;
+        if (player.hp <= 0) { playSound('gameoverSound', true); gameOver(); return; }
+        boss.projectiles.splice(boss.projectiles.indexOf(p),1);
+      }
+    }
+    boss.projectiles = boss.projectiles.filter(p=>p.x>-30);
+    drawBoss(boss);
+    for(let i=0;i<bullets.length;i++) {
+      let b = bullets[i];
+      if (collide(boss, b)) {
+        boss.hp--;
+        bullets.splice(i,1);
+        if (boss.hp<=0) { winGame(); return; }
+        break;
+      }
+    }
+    if (collide(player, boss) && player.alive && bossExplosionTimer === 0) {
+      player.hp--;
+      healthBarTimer = 140;
+      if (player.hp <= 0) { playSound('gameoverSound', true); gameOver(); return; }
+    }
+  }
+  
+  // PLAYER MOVE - Enhanced movement system
+  if (player.alive) {
+    let moveY = 0, moveX = 0;
+    let moveSpeed = 12; // Increased for more responsive movement
+    
+    if (keys['w'] || keys['ArrowUp']) moveY = -1;
+    if (keys['s'] || keys['ArrowDown']) moveY = 1;
+    if (keys['a'] || keys['ArrowLeft']) moveX = -1;
+    if (keys['d'] || keys['ArrowRight']) moveX = 1;
+    
+    // Diagonal movement normalization for consistent speed
+    if (moveX !== 0 && moveY !== 0) {
+      moveX *= 0.707; // sqrt(2)/2 for diagonal movement
+      moveY *= 0.707;
+    }
+    
+    player.x += moveX * moveSpeed;
+    player.y += moveY * moveSpeed;
+    
+    // Boundary checking with padding for better coverage
+    let padding = 5;
+    if (player.x < -padding) player.x = -padding;
+    if (player.x + player.w > GAME_W + padding) player.x = GAME_W + padding - player.w;
+    if (player.y < -padding) player.y = -padding;
+    if (player.y + player.h > GAME_H + padding) player.y = GAME_H + padding - player.h;
+    
+    // Enhanced drag to move with smoother interpolation
+    if(dragToMove && mouse.pressed) {
+      let targetX = mouse.x - player.w/2;
+      let targetY = mouse.y - player.h/2;
+      
+      // Smooth interpolation towards mouse position
+      player.x += (targetX - player.x) * 0.18;
+      player.y += (targetY - player.y) * 0.18;
+      
+      // Boundary checking with padding
+      if (player.x < -padding) player.x = -padding;
+      if (player.x + player.w > GAME_W + padding) player.x = GAME_W + padding - player.w;
+      if (player.y < -padding) player.y = -padding;
+      if (player.y + player.h > GAME_H + padding) player.y = GAME_H + padding - player.h;
+    }
+  }
+  
+  // UI
+  ctx.save();
+  ctx.font="bold 27px Orbitron, Arial";
+  ctx.fillStyle="#caf6fe";
+  ctx.textAlign="left";
+  ctx.shadowColor="#000b";
+  ctx.shadowBlur=8;
+  ctx.fillText("SCORE: " + score, 38, 44);
+  
+  // Show boss warning and boss phase indicator
+  if (bossWarning && !bossSpawned) {
+    ctx.font="bold 24px Orbitron, Arial";
+    ctx.fillStyle="#ff4444";
+    ctx.textAlign="center";
+    // Animasi berkedip untuk warning
+    if (Math.floor(Date.now()/300) % 2 === 0) {
+      ctx.fillText("⚠️ BOSS INCOMING! ⚠️", GAME_W/2, 50);
+    }
+  } else if (gamePhase === "boss" && boss) {
+    ctx.font="bold 20px Orbitron, Arial";
+    ctx.fillStyle="#ff69f5";
+    ctx.textAlign="center";
+    ctx.fillText("BOSS FIGHT!", GAME_W/2, 50);
+  }
+  
+  ctx.restore();
+  
+  if (healthBarTimer > 0) healthBarTimer--;
+  requestAnimationFrame(gameLoop);
+}
+
+window.onload = function() {
+  canvas = document.getElementById('gameCanvas');
+  ctx = canvas.getContext('2d');
+  ui = document.getElementById('uiOverlay');
+  setAllVolume(volume);
+  
+  // Show banner when image loads
+  const bannerImg = document.getElementById('bannerImage');
+  bannerImg.onload = function() {
+    bannerImg.style.display = 'block';
+  };
+  // Fallback if image already loaded
+  if (bannerImg.complete) {
+    bannerImg.style.display = 'block';
+  }
+  
+  showMenu();
+  
+  canvas.addEventListener('mousedown', e=>{
+    if(dragToMove) {
+      mouse.pressed = true;
+      let rect = canvas.getBoundingClientRect();
+      let scaleX = canvas.width / rect.width;
+      let scaleY = canvas.height / rect.height;
+      mouse.x = (e.clientX - rect.left) * scaleX;
+      mouse.y = (e.clientY - rect.top) * scaleY;
+    } else {
+      fireBullet();
+    }
+  });
+  
+  canvas.addEventListener('mouseup', ()=>mouse.pressed=false);
+  
+  canvas.addEventListener('mousemove', e=>{
+    if(dragToMove && mouse.pressed){
+      let rect = canvas.getBoundingClientRect();
+      let scaleX = canvas.width / rect.width;
+      let scaleY = canvas.height / rect.height;
+      mouse.x = (e.clientX - rect.left) * scaleX;
+      mouse.y = (e.clientY - rect.top) * scaleY;
+    }
+  });
+};
+
+window.onkeydown = function(e){
+  keys[e.key.toLowerCase()] = true;
+  if(!gameStart && !bossWinAnim && (e.key==" "||e.key=="Enter")) { 
+    let startBtn = document.getElementById("startBtn") || document.getElementById("retryBtn") || document.getElementById("playAgainBtn");
+    if(startBtn) startBtn.click();
+  }
+  if(gameStart && (e.key==" "||e.key=="Control")) { fireBullet(); }
+};
+
+window.onkeyup = function(e){
+  keys[e.key.toLowerCase()] = false;
+};
+
+document.addEventListener("click", function(e){
+  // Only trigger start if user klik di tombol START/RETRY/PLAY AGAIN
+  if (!gameStart && !bossWinAnim) {
+    let t = e.target;
+    if (t.id=="startBtn" || t.id=="retryBtn" || t.id=="playAgainBtn") {
+      t.click();
+    }
+  } else if(gameStart && !bossWinAnim) {
+    fireBullet();
+  }
+});
+
+window.onblur = function(){ for(let k in keys) keys[k]=false; mouse.pressed=false; };
+</script>
+</body>
+</html>
