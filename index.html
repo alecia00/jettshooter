@@ -255,37 +255,21 @@
 <body>
 <div id="gameContainer">
   <div id="bannerContainer">
-    <img id="bannerImage" src="https://via.placeholder.com/400x80/1a237e/6fdfff?text=EthOS+Space+Shooter" alt="EthOS Banner">
+    <img id="bannerImage" src="banner.png" alt="EthOS Banner">
   </div>
   <canvas id="gameCanvas" width="1100" height="620"></canvas>
 </div>
 <div id="uiOverlay"></div>
 
 <!-- AUDIO SOUND EFFECTS -->
-<audio id="startSound" preload="none">
-  <source src="https://www.soundjay.com/misc/sounds/beep-07a.wav" type="audio/wav">
-</audio>
-<audio id="backSound" loop preload="none">
-  <source src="https://www.soundjay.com/misc/sounds/beep-07a.wav" type="audio/wav">
-</audio>
-<audio id="bossSound" loop preload="none">
-  <source src="https://www.soundjay.com/misc/sounds/beep-07a.wav" type="audio/wav">
-</audio>
-<audio id="laserSound" preload="none">
-  <source src="https://www.soundjay.com/misc/sounds/beep-07a.wav" type="audio/wav">
-</audio>
-<audio id="gameoverSound" preload="none">
-  <source src="https://www.soundjay.com/misc/sounds/beep-07a.wav" type="audio/wav">
-</audio>
-<audio id="rewardSound" preload="none">
-  <source src="https://www.soundjay.com/misc/sounds/beep-07a.wav" type="audio/wav">
-</audio>
-<audio id="finishSound" preload="none">
-  <source src="https://www.soundjay.com/misc/sounds/beep-07a.wav" type="audio/wav">
-</audio>
-<audio id="explosionSound" preload="none">
-  <source src="https://www.soundjay.com/misc/sounds/beep-07a.wav" type="audio/wav">
-</audio>
+<audio id="startSound" src="start.mp3"></audio>
+<audio id="backSound" src="backsound.mp3" loop></audio>
+<audio id="bossSound" src="soundbos.mp3" loop></audio>
+<audio id="laserSound" src="laser.mp3"></audio>
+<audio id="gameoverSound" src="gameover.mp3"></audio>
+<audio id="rewardSound" src="reward.mp3"></audio>
+<audio id="finishSound" src="finish.mp3"></audio>
+<audio id="explosionSound" src="ledak.wav"></audio>
 
 <script>
 const GAME_W = 1100, GAME_H = 620;
@@ -306,12 +290,10 @@ let config, lastShot = 0, lastEnemy = 0, lastReward = 0, lastHealth = 0, bossTim
 let bossExplosionTimer = 0, bossExplosions = [];
 let bgmPlaying = false;
 let imgPlayer = new Image(), imgEnemy = new Image(), imgReward = new Image(), imgBoss = new Image(), imgHealth = new Image();
-
-// Set image sources with proper URLs or create fallbacks
-imgPlayer.src = "https://via.placeholder.com/90x86/4a9eff/ffffff?text=SHIP";
-imgEnemy.src = "https://via.placeholder.com/78x68/ff4444/ffffff?text=ENEMY";
-imgReward.src = "https://via.placeholder.com/60x60/ffd700/000000?text=COIN"; // FIXED: was ".png"
-imgBoss.src = "https://via.placeholder.com/160x140/9c27b0/ffffff?text=BOSS";
+imgPlayer.src = "karakter.png";
+imgEnemy.src = "enemy.png";
+imgReward.src = "reward.png";
+imgBoss.src = "boss.png";
 
 // Generate health pack image (red cross)
 function genHealthImage() {
@@ -342,36 +324,13 @@ function setAllVolume(vol) {
 function playSound(id, force) {
   let el = document.getElementById(id);
   if (!el) return;
-  
-  // Handle audio loading and playing with error handling
-  try {
-    el.currentTime = 0;
-    if (force || el.paused) {
-      let playPromise = el.play();
-      if (playPromise !== undefined) {
-        playPromise.catch(error => {
-          console.log("Audio play failed:", error);
-          // Audio failed to play, but continue game
-        });
-      }
-    }
-  } catch (error) {
-    console.log("Audio error:", error);
-    // Continue without audio
-  }
+  el.currentTime = 0;
+  if (force || el.paused) el.play();
 }
-
 function stopSound(id) {
   let el = document.getElementById(id);
-  if (el && !el.paused) {
-    try {
-      el.pause();
-    } catch (error) {
-      console.log("Audio stop failed:", error);
-    }
-  }
+  if (el && !el.paused) el.pause();
 }
-
 function randInt(a, b) { return a + Math.floor(Math.random()*(b-a+1)); }
 function randF(a, b) { return a + Math.random()*(b-a); }
 function collide(r1, r2) {
@@ -391,19 +350,7 @@ function drawPlayer(winBlink = false) {
     ctx.filter = 'drop-shadow(0 0 40px #ffff94)';
   }
   ctx.shadowColor="#0ff"; ctx.shadowBlur=18;
-  
-  // Check if image is loaded before drawing
-  if (imgPlayer.complete && imgPlayer.naturalWidth > 0) {
-    ctx.drawImage(imgPlayer, player.x, player.y, player.w, player.h);
-  } else {
-    // Fallback drawing if image fails
-    ctx.fillStyle = "#4a9eff";
-    ctx.fillRect(player.x, player.y, player.w, player.h);
-    ctx.fillStyle = "#ffffff";
-    ctx.font = "12px Arial";
-    ctx.fillText("SHIP", player.x + 30, player.y + 45);
-  }
-  
+  ctx.drawImage(imgPlayer, player.x, player.y, player.w, player.h);
   ctx.restore();
   // Health bar
   if (player.hp < player.maxHp || healthBarTimer > 0 || bossTime < 2) {
@@ -424,54 +371,24 @@ function drawPlayer(winBlink = false) {
     ctx.restore();
   }
 }
-
 function drawEnemy(e) {
   ctx.save();
   ctx.shadowColor="#ff0"; ctx.shadowBlur=14;
-  
-  if (imgEnemy.complete && imgEnemy.naturalWidth > 0) {
-    ctx.drawImage(imgEnemy, e.x, e.y, e.w, e.h);
-  } else {
-    // Fallback drawing
-    ctx.fillStyle = "#ff4444";
-    ctx.fillRect(e.x, e.y, e.w, e.h);
-    ctx.fillStyle = "#ffffff";
-    ctx.font = "10px Arial";
-    ctx.fillText("ENEMY", e.x + 20, e.y + 35);
-  }
-  
+  ctx.drawImage(imgEnemy, e.x, e.y, e.w, e.h);
   ctx.restore();
 }
-
 function drawReward(rw) {
   ctx.save();
   ctx.shadowColor="#f9f95a"; ctx.shadowBlur=16;
-  
-  if (imgReward.complete && imgReward.naturalWidth > 0) {
-    ctx.drawImage(imgReward, rw.x, rw.y, rw.w, rw.h);
-  } else {
-    // Fallback drawing - golden circle
-    ctx.fillStyle = "#ffd700";
-    ctx.beginPath();
-    ctx.arc(rw.x + rw.w/2, rw.y + rw.h/2, rw.w/2, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.fillStyle = "#000000";
-    ctx.font = "20px Arial";
-    ctx.textAlign = "center";
-    ctx.fillText("E", rw.x + rw.w/2, rw.y + rw.h/2 + 7);
-    ctx.textAlign = "left";
-  }
-  
+  ctx.drawImage(imgReward, rw.x, rw.y, rw.w, rw.h);
   ctx.restore();
 }
-
 function drawHealthPack(hp) {
   ctx.save();
   ctx.shadowColor="#ff4444"; ctx.shadowBlur=12;
   ctx.drawImage(imgHealth, hp.x, hp.y, hp.w, hp.h);
   ctx.restore();
 }
-
 function drawBullet(b) {
   ctx.save();
   ctx.globalAlpha = 0.9;
@@ -486,7 +403,6 @@ function drawBullet(b) {
   ctx.globalAlpha = 1.0;
   ctx.restore();
 }
-
 function drawBoss(b) {
   if (bossExplosionTimer > 0) {
     // Boss explosion effect
@@ -519,18 +435,7 @@ function drawBoss(b) {
   
   ctx.save();
   ctx.shadowColor="#ff69f5"; ctx.shadowBlur=30;
-  
-  if (imgBoss.complete && imgBoss.naturalWidth > 0) {
-    ctx.drawImage(imgBoss, b.x, b.y, b.w, b.h);
-  } else {
-    // Fallback drawing
-    ctx.fillStyle = "#9c27b0";
-    ctx.fillRect(b.x, b.y, b.w, b.h);
-    ctx.fillStyle = "#ffffff";
-    ctx.font = "16px Arial";
-    ctx.fillText("BOSS", b.x + 60, b.y + 75);
-  }
-  
+  ctx.drawImage(imgBoss, b.x, b.y, b.w, b.h);
   ctx.restore();
   // HP bar
   let bx = b.x+b.w/2-48, by = b.y-24;
@@ -661,20 +566,8 @@ function changeVolume(delta) {
 
 function toggleBGM() {
   let bg = document.getElementById("backSound");
-  if(bg.paused) { 
-    let playPromise = bg.play(); 
-    if (playPromise !== undefined) {
-      playPromise.then(() => {
-        document.getElementById("bgmBtn").textContent="Pause BGM";
-      }).catch(() => {
-        console.log("BGM play failed");
-      });
-    }
-  }
-  else { 
-    bg.pause(); 
-    document.getElementById("bgmBtn").textContent="Play BGM"; 
-  }
+  if(bg.paused) { bg.play(); document.getElementById("bgmBtn").textContent="Pause BGM"; }
+  else { bg.pause(); document.getElementById("bgmBtn").textContent="Play BGM"; }
 }
 
 function toggleMoveMode() {
@@ -1105,3 +998,6 @@ document.addEventListener("click", function(e){
 });
 
 window.onblur = function(){ for(let k in keys) keys[k]=false; mouse.pressed=false; };
+</script>
+</body>
+</html>
