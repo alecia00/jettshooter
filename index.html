@@ -248,15 +248,19 @@
     /* Mobile Virtual Controls */
     #mobileControls {
       position: fixed;
-      bottom: 0;
-      left: 0;
-      width: 100vw;
-      height: 120px;
-      background: rgba(16, 17, 37, 0.95);
-      border-top: 2px solid #1a237e;
+      bottom: 120px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 90vw;
+      max-width: 500px;
+      height: 180px;
+      background: rgba(16, 17, 37, 0.92);
+      border: 2px solid #1a237e;
+      border-radius: 20px;
       display: none;
       z-index: 15;
-      backdrop-filter: blur(10px);
+      backdrop-filter: blur(15px);
+      box-shadow: 0 8px 32px rgba(26, 35, 126, 0.4);
     }
     
     .mobile-control-area {
@@ -264,102 +268,102 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 0 20px;
+      padding: 0 30px;
     }
     
     .mobile-dpad {
       position: relative;
-      width: 120px;
-      height: 120px;
+      width: 160px;
+      height: 160px;
     }
     
     .mobile-btn {
       position: absolute;
       background: linear-gradient(135deg, #1a237e, #00c9ff);
-      border: 2px solid #6fdfff;
-      border-radius: 8px;
+      border: 3px solid #6fdfff;
+      border-radius: 12px;
       color: #fff;
       font-family: 'Orbitron', Arial, sans-serif;
       font-weight: bold;
-      font-size: 14px;
+      font-size: 20px;
       cursor: pointer;
       user-select: none;
       transition: all 0.1s;
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 4px 12px rgba(26, 35, 126, 0.3);
+      box-shadow: 0 6px 16px rgba(26, 35, 126, 0.5);
     }
     
     .mobile-btn:active {
       background: linear-gradient(135deg, #00c9ff, #1a237e);
-      transform: scale(0.95);
-      box-shadow: 0 2px 8px rgba(0, 201, 255, 0.5);
+      transform: scale(0.9);
+      box-shadow: 0 3px 12px rgba(0, 201, 255, 0.7);
     }
     
     .mobile-btn.up {
       top: 0;
       left: 50%;
       transform: translateX(-50%);
-      width: 35px;
-      height: 35px;
+      width: 55px;
+      height: 55px;
     }
     
     .mobile-btn.down {
       bottom: 0;
       left: 50%;
       transform: translateX(-50%);
-      width: 35px;
-      height: 35px;
+      width: 55px;
+      height: 55px;
     }
     
     .mobile-btn.left {
       left: 0;
       top: 50%;
       transform: translateY(-50%);
-      width: 35px;
-      height: 35px;
+      width: 55px;
+      height: 55px;
     }
     
     .mobile-btn.right {
       right: 0;
       top: 50%;
       transform: translateY(-50%);
-      width: 35px;
-      height: 35px;
+      width: 55px;
+      height: 55px;
     }
     
     .mobile-shoot-btn {
-      width: 80px;
-      height: 80px;
+      width: 100px;
+      height: 100px;
       border-radius: 50%;
       background: linear-gradient(135deg, #ff4444, #ff8888);
-      border: 3px solid #ffaaaa;
+      border: 4px solid #ffaaaa;
       color: #fff;
       font-family: 'Orbitron', Arial, sans-serif;
       font-weight: bold;
-      font-size: 16px;
+      font-size: 18px;
       cursor: pointer;
       user-select: none;
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 6px 16px rgba(255, 68, 68, 0.4);
+      box-shadow: 0 8px 20px rgba(255, 68, 68, 0.5);
       transition: all 0.1s;
     }
     
     .mobile-shoot-btn:active {
       background: linear-gradient(135deg, #ff8888, #ff4444);
-      transform: scale(0.9);
-      box-shadow: 0 4px 12px rgba(255, 136, 136, 0.6);
+      transform: scale(0.85);
+      box-shadow: 0 6px 16px rgba(255, 136, 136, 0.7);
     }
 
     @media (max-width: 1200px) {
-      canvas { max-width: 98vw; max-height: calc(86vh - 120px);}
+      canvas { max-width: 98vw; max-height: calc(86vh - 60px);}
       .menu { min-width: 0; padding: 18px 5vw;}
       #bannerContainer { max-width: 98vw; height: 80px; margin-bottom: 5px; }
       #bannerImage { max-height: 60px; max-width: 300px; }
-      #gameContainer { padding-bottom: 120px; }
+      #gameContainer { padding-bottom: 60px; }
     }
 
     /* Show mobile controls only on touch devices */
